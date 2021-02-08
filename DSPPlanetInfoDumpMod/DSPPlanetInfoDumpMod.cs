@@ -2,7 +2,6 @@
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
-using HarmonyLib.Tools;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,32 +13,69 @@ using UnityEngine.SceneManagement;
 using UI = UnityEngine.UI;
 namespace DSPPlanetInfoDumpMod
 {
-    [BepInPlugin("jp.osilver.dk.plugins.dspmod.PlanetInfoDump", "DSP Planet Info Dump Mod", "0.0.0.2")]
+    [BepInPlugin("jp.osilver.dk.plugins.dspmod.PlanetInfoDump", "DSP Planet Info Dump Mod", "1.0.0.0")]
     public class DSPPlanetDumpMod : BaseUnityPlugin
     {
-        private static ConfigEntry<bool> configFullExtact;
-
-        private void Awake()
+        private static ConfigEntry<KeyCode> configOutputMessageBoxHotKey;
+        public void Awake()
         {
             LogManager.Logger = Logger;
-            LogManager.Logger.LogInfo("DSP Planet Dump Mod Info plugin start");
-            configFullExtact = Config.Bind(
-                "General",
-                "FullExtract",
-                false,
-                "DSP起動前に値を設定してください。" + Environment.NewLine +
-                "false:保持情報そのままの資源情報を出力します。検索済みでない惑星の資源は0になります。" + Environment.NewLine +
-                "true:全ての資源情報を出力します。初回出力時にフリーズしますが放置すれば大丈夫です。全ての惑星が検索済みになります。セーブデータが増加します。");
-            Harmony.CreateAndPatchAll(typeof(UISaveGameWindow_SaveSucceed));
+            Harmony.CreateAndPatchAll(typeof(DSPPlanetDumpMod));
         }
 
-        [HarmonyPatch(typeof(UISaveGameWindow), "SaveSucceed")]
+        public void Start()
+        {
+            LogManager.Logger.LogInfo("DSP Planet Dump Mod Info plugin start");
+            configOutputMessageBoxHotKey = Config.Bind(
+                "General",
+                "configOutputMessageBoxHotKey",
+                KeyCode.F2,
+               "出力用メッセージボックスを表示するキーを設定します。");
+        }
+
+        public void Update()
+        {
+            if (GameMain.isPaused || GameMain.isFullscreenPaused)
+            {
+                if (Input.GetKeyDown(configOutputMessageBoxHotKey.Value))
+                {
+                    var message =
+                        "標準出力：資源情報を出力します。" +
+                        "全出力：全資源情報を出力します。フリーズしますが放置すれば大丈夫。";
+                    UIMessageBox messageBox = UIMessageBox.Show(
+                        "惑星情報一覧出力",
+                        message,
+                        "キャンセル",
+                        "全出力",
+                        "標準出力",
+                        0,
+                        new UIMessageBox.Response(this.Cancel),
+                        new UIMessageBox.Response(this.FullExtract),
+                        new UIMessageBox.Response(this.SimpleExtract)); ;
+                }
+            }
+        }
+        public void SimpleExtract()
+        {
+            UISaveGameWindow_SaveSucceed.IsFullExtract = false;
+            UISaveGameWindow_SaveSucceed.Postfix();
+        }
+
+        public void FullExtract()
+        {
+            UISaveGameWindow_SaveSucceed.IsFullExtract = true;
+            UISaveGameWindow_SaveSucceed.Postfix();
+        }
+        public void Cancel()
+        {
+            ;
+        }
+
         public class UISaveGameWindow_SaveSucceed
         {
-            [HarmonyPostfix]
-            public static void Postfix(UISaveGameWindow __instance)
+            public static bool IsFullExtract = false;
+            public static void Postfix()
             {
-                bool isFullExtract = configFullExtact.Value;
                 try
                 {
                     LogManager.Logger.LogInfo("DSP Planet Info Dump Mod plugin UISaveGameWindow#SaveSucceed Postfix start");
@@ -48,7 +84,7 @@ namespace DSPPlanetInfoDumpMod
                     var currentStar = starDetail.star;
                     var currentPlanet = planetDetail.planet;
                     var currentUniverseObserveLevel = GameMain.history.universeObserveLevel;
-                    if (isFullExtract)
+                    if (IsFullExtract)
                     {
                         GameMain.history.universeObserveLevel = 4;
                     }
@@ -83,7 +119,7 @@ namespace DSPPlanetInfoDumpMod
                         }
                         foreach (var planet in star.planets)
                         {
-                            if (isFullExtract)
+                            if (IsFullExtract)
                             {
                                 // implements from PlanetComputeThreadMain
                                 var algorithm = PlanetModelingManager.Algorithm(planet);
@@ -192,3 +228,4 @@ namespace DSPPlanetInfoDumpMod
         }
     }
 }
+
