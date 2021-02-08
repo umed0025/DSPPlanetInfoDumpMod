@@ -76,4 +76,11 @@
     <Content Include="libs\UnityEngine.UI.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>if not exist "$(TargetDir)$(ProjectName)" mkdir "$(TargetDir)$(ProjectName)"
+copy /Y "$(TargetDir)$(TargetName)$(TargetExt)" "$(TargetDir)$(ProjectName)"
+copy /Y "$(SolutionDir)\README.md"  "$(TargetDir)$(ProjectName)"
+
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -14,13 +14,22 @@ using UnityEngine.SceneManagement;
 using UI = UnityEngine.UI;
 namespace DSPPlanetInfoDumpMod
 {
-    [BepInPlugin("jp.osilver.dk.plugins.dspmod", "DSP Planet Info Dump Mod", "0.0.0.1")]
+    [BepInPlugin("jp.osilver.dk.plugins.dspmod.PlanetInfoDump", "DSP Planet Info Dump Mod", "0.0.0.2")]
     public class DSPPlanetDumpMod : BaseUnityPlugin
     {
+        private static ConfigEntry<bool> configFullExtact;
+
         private void Awake()
         {
             LogManager.Logger = Logger;
             LogManager.Logger.LogInfo("DSP Planet Dump Mod Info plugin start");
+            configFullExtact = Config.Bind(
+                "General",
+                "FullExtract",
+                false,
+                "DSP起動前に値を設定してください。" + Environment.NewLine +
+                "false:保持情報そのままの資源情報を出力します。検索済みでない惑星の資源は0になります。" + Environment.NewLine +
+                "true:全ての資源情報を出力します。初回出力時にフリーズしますが放置すれば大丈夫です。全ての惑星が検索済みになります。セーブデータが増加します。");
             Harmony.CreateAndPatchAll(typeof(UISaveGameWindow_SaveSucceed));
         }
 
@@ -30,6 +39,7 @@ namespace DSPPlanetInfoDumpMod
             [HarmonyPostfix]
             public static void Postfix(UISaveGameWindow __instance)
             {
+                bool isFullExtract = configFullExtact.Value;
                 try
                 {
                     LogManager.Logger.LogInfo("DSP Planet Info Dump Mod plugin UISaveGameWindow#SaveSucceed Postfix start");
@@ -38,7 +48,10 @@ namespace DSPPlanetInfoDumpMod
                     var currentStar = starDetail.star;
                     var currentPlanet = planetDetail.planet;
                     var currentUniverseObserveLevel = GameMain.history.universeObserveLevel;
-                    GameMain.history.universeObserveLevel = 4;
+                    if (isFullExtract)
+                    {
+                        GameMain.history.universeObserveLevel = 4;
+                    }
                     var galaxy = GameMain.data.galaxy;
                     string starHeader = "Planetary System Name\tName\tAmount";
                     var starStringBuilder = new StringBuilder();
@@ -68,17 +81,30 @@ namespace DSPPlanetInfoDumpMod
                             currentPlanetLoaded.Add(planet.loaded);
                             planet.loaded = true;
                         }
-                        starDetail.star = star;
-                        foreach (var uiResAmountEntry in starDetail.entries)
-                        {
-                            starStringBuilder.Append(star.displayName).Append("\t");
-                            var name = GetUIResAmountEntryLabelText(uiResAmountEntry);
-                            var value = uiResAmountEntry.valueString;
-                            starStringBuilder.Append(name).Append("\t");
-                            starStringBuilder.Append(value).AppendLine();
-                        }
                         foreach (var planet in star.planets)
                         {
+                            if (isFullExtract)
+                            {
+                                // implements from PlanetComputeThreadMain
+                                var algorithm = PlanetModelingManager.Algorithm(planet);
+                                if (planet.data == null)
+                                {
+                                    planet.data = new PlanetRawData(planet.precision);
+                                    planet.modData = planet.data.InitModData(planet.modData);
+                                    planet.data.CalcVerts();
+                                    planet.aux = new PlanetAuxData(planet);
+                                    algorithm.GenerateTerrain(planet.mod_x, planet.mod_y);
+                                    algorithm.CalcWaterPercent();
+                                }
+                                if (planet.factory == null)
+                                {
+                                    if (planet.type != EPlanetType.Gas)
+                                    {
+                                        algorithm.GenerateVegetables();
+                                        algorithm.GenerateVeins(false);
+                                    }
+                                }
+                            }
                             planetDetail.planet = planet;
                             foreach (var uiResAmountEntry in planetDetail.entries)
                             {
@@ -107,6 +133,15 @@ namespace DSPPlanetInfoDumpMod
                             planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "inclinationValueText")).Append("\t");
                             planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "obliquityValueText")).AppendLine();
                         }
+                        starDetail.star = star;
+                        foreach (var uiResAmountEntry in starDetail.entries)
+                        {
+                            starStringBuilder.Append(star.displayName).Append("\t");
+                            var name = GetUIResAmountEntryLabelText(uiResAmountEntry);
+                            var value = uiResAmountEntry.valueString;
+                            starStringBuilder.Append(name).Append("\t");
+                            starStringBuilder.Append(value).AppendLine();
+                        }
                         var planetIndex = 0;
                         foreach (var planet in star.planets)
                         {
@@ -118,7 +153,7 @@ namespace DSPPlanetInfoDumpMod
                     //LogManager.Logger.LogInfo(planetStringBuilderExtraInfo.ToString());
                     var currentDateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
                     File.WriteAllText(string.Format("PlanetarySystems-{0}.txt", currentDateTime), starStringBuilder.ToString());
-                    File.WriteAllText(string.Format("Planets-{0}.txt", currentDateTime), planetStringBuilder.ToString());
+                    File.WriteAllText(string.Format("PlanetsResource-{0}.txt", currentDateTime), planetStringBuilder.ToString());
                     File.WriteAllText(string.Format("PlanetsExtraInfo-{0}.txt", currentDateTime), planetStringBuilderExtraInfo.ToString());
                     starDetail.star = currentStar;
                     planetDetail.planet = currentPlanet;
