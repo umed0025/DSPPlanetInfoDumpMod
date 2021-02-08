@@ -113,9 +113,9 @@ namespace DSPPlanetInfoDumpMod
                             planet.loaded = currentPlanetLoaded[planetIndex];
                         }
                     }
-                    LogManager.Logger.LogInfo(starStringBuilder.ToString());
-                    LogManager.Logger.LogInfo(planetStringBuilder.ToString());
-                    LogManager.Logger.LogInfo(planetStringBuilderExtraInfo.ToString());
+                    //LogManager.Logger.LogInfo(starStringBuilder.ToString());
+                    //LogManager.Logger.LogInfo(planetStringBuilder.ToString());
+                    //LogManager.Logger.LogInfo(planetStringBuilderExtraInfo.ToString());
                     var currentDateTime = DateTime.Now.ToString("yyyyMMddHHmmss");
                     File.WriteAllText(string.Format("PlanetarySystems-{0}.txt", currentDateTime), starStringBuilder.ToString());
                     File.WriteAllText(string.Format("Planets-{0}.txt", currentDateTime), planetStringBuilder.ToString());
