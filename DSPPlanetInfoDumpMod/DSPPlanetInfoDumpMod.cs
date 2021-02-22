@@ -13,7 +13,7 @@ using UnityEngine.SceneManagement;
 using UI = UnityEngine.UI;
 namespace DSPPlanetInfoDumpMod
 {
-    [BepInPlugin("jp.osilver.dk.plugins.dspmod.PlanetInfoDump", "DSP Planet Info Dump Mod", "1.0.0.0")]
+    [BepInPlugin("PlanetInfoDump", "DSP Planet Info Dump Mod", "1.0.0.1")]
     public class DSPPlanetDumpMod : BaseUnityPlugin
     {
         private static ConfigEntry<KeyCode> configOutputMessageBoxHotKey;
@@ -42,7 +42,7 @@ namespace DSPPlanetInfoDumpMod
                     var message =
                         "標準出力：資源情報を出力します。" +
                         "全出力：全資源情報を出力します。フリーズしますが放置すれば大丈夫。";
-                    UIMessageBox messageBox = UIMessageBox.Show(
+                    var messageBox = UIMessageBox.Show(
                         "惑星情報一覧出力",
                         message,
                         "キャンセル",
@@ -52,6 +52,10 @@ namespace DSPPlanetInfoDumpMod
                         new UIMessageBox.Response(this.Cancel),
                         new UIMessageBox.Response(this.FullExtract),
                         new UIMessageBox.Response(this.SimpleExtract)); ;
+                    if (Input.GetKeyDown(KeyCode.Escape))
+                    {
+                        messageBox.FadeOut();
+                    }
                 }
             }
         }
@@ -70,6 +74,8 @@ namespace DSPPlanetInfoDumpMod
         {
             ;
         }
+
+        private const string FULL_TYPE_TARGET_TEXT = "<color";
 
         public class UISaveGameWindow_SaveSucceed
         {
@@ -102,7 +108,7 @@ namespace DSPPlanetInfoDumpMod
                     planetStringBuilder.Append(planetHeader);
                     planetStringBuilder.Append(planetHeaderRemark);
                     planetStringBuilder.AppendLine();
-                    var planetStringBuilderExtraInfoHeader = "惑星名\t惑星種別\t軌道半径対象\t軌道半径\t公転周期\t自転周期\t軌道傾斜角度\t自転軸傾斜角";
+                    var planetStringBuilderExtraInfoHeader = "惑星名\t惑星種別\t特異性\t軌道半径対象\t軌道半径\t公転周期\t自転周期\t軌道傾斜角度\t自転軸傾斜角";
                     var planetStringBuilderExtraInfo = new StringBuilder();
                     planetStringBuilderExtraInfo.Append(string.Format("Seed No\t{0}", galaxy.seed)).AppendLine();
                     planetStringBuilderExtraInfo.AppendLine();
@@ -147,8 +153,8 @@ namespace DSPPlanetInfoDumpMod
                                 planetStringBuilder.Append(star.displayName).Append("\t");
                                 planetStringBuilder.Append(planet.displayName).Append("\t");
                                 var name = GetUIResAmountEntryLabelText(uiResAmountEntry);
-                                var value = uiResAmountEntry.valueString;
                                 planetStringBuilder.Append(name).Append("\t");
+                                var value = uiResAmountEntry.valueString;
                                 planetStringBuilder.Append(value).Append("\t");
                                 var isGas = (planet.type == EPlanetType.Gas);
                                 var isData = (planet.data != null);
@@ -161,7 +167,23 @@ namespace DSPPlanetInfoDumpMod
                                 planetStringBuilder.AppendLine();
                             }
                             planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "nameText")).Append("\t");
-                            planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "typeText")).Append("\t");
+                            var fullTypeName = GetPlanetDetailField(planetDetail, "typeText");
+                            LogManager.Logger.LogInfo("fullTypeName;" + fullTypeName);
+                            int fullTypeTargetIndex = fullTypeName.IndexOf(FULL_TYPE_TARGET_TEXT);
+                            int fullTypeNameLength = fullTypeName.Length;
+                            LogManager.Logger.LogInfo("fullTypeTargetIndex;" + fullTypeTargetIndex);
+                            LogManager.Logger.LogInfo("fullTypeNameLength;" + fullTypeNameLength);
+                            var typeName = "";
+                            var typespecificity = "";
+                            if (0 < fullTypeTargetIndex)
+                            {
+                                typeName = fullTypeName.Substring(0, fullTypeTargetIndex); ;
+                                typespecificity = fullTypeName.Substring(fullTypeTargetIndex, fullTypeNameLength - fullTypeTargetIndex);
+                            }
+                            LogManager.Logger.LogInfo("typeName;" + typeName);
+                            LogManager.Logger.LogInfo("speciftypespecificityicity;" + typespecificity);
+                            planetStringBuilderExtraInfo.Append(typeName).Append("\t");
+                            planetStringBuilderExtraInfo.Append(typespecificity).Append("\t");
                             planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "orbitRadiusValueTextEx")).Append("\t");
                             planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "orbitRadiusValueText")).Append("\t");
                             planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "orbitPeriodValueText")).Append("\t");
