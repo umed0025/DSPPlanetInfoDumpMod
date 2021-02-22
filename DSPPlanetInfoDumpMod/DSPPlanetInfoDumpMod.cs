@@ -171,8 +171,6 @@ namespace DSPPlanetInfoDumpMod
                             LogManager.Logger.LogInfo("fullTypeName;" + fullTypeName);
                             int fullTypeTargetIndex = fullTypeName.IndexOf(FULL_TYPE_TARGET_TEXT);
                             int fullTypeNameLength = fullTypeName.Length;
-                            LogManager.Logger.LogInfo("fullTypeTargetIndex;" + fullTypeTargetIndex);
-                            LogManager.Logger.LogInfo("fullTypeNameLength;" + fullTypeNameLength);
                             var typeName = "";
                             var typespecificity = "";
                             if (0 < fullTypeTargetIndex)
@@ -180,8 +178,6 @@ namespace DSPPlanetInfoDumpMod
                                 typeName = fullTypeName.Substring(0, fullTypeTargetIndex); ;
                                 typespecificity = fullTypeName.Substring(fullTypeTargetIndex, fullTypeNameLength - fullTypeTargetIndex);
                             }
-                            LogManager.Logger.LogInfo("typeName;" + typeName);
-                            LogManager.Logger.LogInfo("speciftypespecificityicity;" + typespecificity);
                             planetStringBuilderExtraInfo.Append(typeName).Append("\t");
                             planetStringBuilderExtraInfo.Append(typespecificity).Append("\t");
                             planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "orbitRadiusValueTextEx")).Append("\t");
