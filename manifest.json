@@ -1,4 +1,11 @@
 {
+    "name": "DSPPlanetInfoDumpMod",
+    "version_number": "1.0.1",
+    "website_url": "https://github.com/umed0025/DSPPlanetInfoDumpMod",
+    "description": "テキストベースの惑星情報一覧を出力することが出来るようになります",
+    "dependencies": [
+        "xiaoye97-BepInEx-5.4.5"
+    ],
   "ManifestVersion": 2,
   "AuthorName": "umed0025",
   "Name": "umed0025-DSPPlanetInfoDumpMod",
