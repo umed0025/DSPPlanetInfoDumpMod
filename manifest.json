@@ -1,0 +1,23 @@
+{
+  "ManifestVersion": 2,
+  "AuthorName": "umed0025",
+  "Name": "umed0025-DSPPlanetInfoDumpMod",
+  "DisplayName": "DSPPlanetInfoDumpMod",
+  "Version": "1.0.1",
+  "Licence": "MIT",
+  "WebsiteURL": "https://github.com/umed0025/DSPPlanetInfoDumpMod",
+  "Description": "テキストベースの惑星情報一覧を出力することが出来るようになります",
+  "GameVersion": "N/A",
+  "Dependencies": [
+    "xiaoye97-BepInEx-5.4.5"
+  ],
+  "OptionalDependencies": [],
+  "Incompatibilities": [],
+  "NetworkMode": "both",
+  "PackageType": "mod",
+  "InstallMode": "managed",
+  "Loaders": [
+    "bepinex"
+  ],
+  "ExtraData": {}
+}

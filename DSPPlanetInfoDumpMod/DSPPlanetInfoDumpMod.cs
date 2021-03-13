@@ -13,7 +13,7 @@ using UnityEngine.SceneManagement;
 using UI = UnityEngine.UI;
 namespace DSPPlanetInfoDumpMod
 {
-    [BepInPlugin("PlanetInfoDump", "DSP Planet Info Dump Mod", "1.0.0.1")]
+    [BepInPlugin("PlanetInfoDump", "DSP Planet Info Dump Mod", "1.0.1")]
     public class DSPPlanetDumpMod : BaseUnityPlugin
     {
         private static ConfigEntry<KeyCode> configOutputMessageBoxHotKey;

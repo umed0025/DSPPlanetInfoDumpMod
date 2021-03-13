@@ -3,13 +3,6 @@
 * Dyson Sphere Program Modです。
 * テキストベースの惑星情報一覧を出力することが出来るようになります。
 
-# 導入方法
-
-* 前提プラグイン
-    * BepInEx 5.4.5
-* 導入先
-    * 「SteamLibrary/steamapps/common/Dyson Sphere Program/BepInEx/plugins/DSPPlanetDumpMod」に「DSPPlanetInfoDumpMod.dll」を配置してください。
-
 # 実行方法
 
 * ゲーム画面で「ESCキー」を押し「F2」キーを押すと「惑星情報一覧出力」が表示されます。
@@ -28,3 +21,11 @@
 # 出力されたデータの利用方法について
 
 * タブ区切りで出力しているため、Googleスプレッドシートや、Excelへ貼り付けることによりフィルターによる絞り込みが可能です。
+
+# 手動での導入方法
+
+* 前提プラグイン
+    * BepInEx 5.4.5
+* 導入先
+    * 「SteamLibrary/steamapps/common/Dyson Sphere Program/BepInEx/plugins/DSPPlanetDumpMod」に「DSPPlanetInfoDumpMod.dll」を配置してください。
+
