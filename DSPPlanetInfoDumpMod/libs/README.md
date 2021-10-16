@@ -8,7 +8,7 @@
     + UnityEngine.UI.dll
 
 ## 別途ダウンロード
-* [BepInEx 5.4.5](https://github.com/BepInEx/BepInEx/releases)からダウンロード
+* [BepInEx 5.4.11](https://github.com/BepInEx/BepInEx/releases)からダウンロード
 * 「BepInEx/core」より取得
     * 0Harmony.dll
     * BepInEx.dll

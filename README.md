@@ -25,7 +25,7 @@
 # 手動での導入方法
 
 * 前提プラグイン
-    * BepInEx 5.4.5
+    * BepInEx 5.4.11
 * 導入先
     * 「SteamLibrary/steamapps/common/Dyson Sphere Program/BepInEx/plugins/DSPPlanetDumpMod」に「DSPPlanetInfoDumpMod.dll」を配置してください。
 
