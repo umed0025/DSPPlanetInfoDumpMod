@@ -150,9 +150,13 @@ namespace DSPPlanetInfoDumpMod
                             planetDetail.planet = planet;
                             foreach (var uiResAmountEntry in planetDetail.entries)
                             {
+                                if (uiResAmountEntry == null)
+                                {
+                                    continue;
+                                }
                                 planetStringBuilder.Append(star.displayName).Append("\t");
                                 planetStringBuilder.Append(planet.displayName).Append("\t");
-                                var name = GetUIResAmountEntryLabelText(uiResAmountEntry);
+                                var name = uiResAmountEntry.labelText.text;
                                 planetStringBuilder.Append(name).Append("\t");
                                 var value = uiResAmountEntry.valueString;
                                 planetStringBuilder.Append(value).Append("\t");
@@ -166,8 +170,8 @@ namespace DSPPlanetInfoDumpMod
                                 planetStringBuilder.Append(isFlag).Append("\t");
                                 planetStringBuilder.AppendLine();
                             }
-                            planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "nameText")).Append("\t");
-                            var fullTypeName = GetPlanetDetailField(planetDetail, "typeText");
+                            planetStringBuilderExtraInfo.Append(planetDetail.nameInput.text).Append("\t");
+                            var fullTypeName = planetDetail.typeText.text;
                             LogManager.Logger.LogInfo("fullTypeName;" + fullTypeName);
                             int fullTypeTargetIndex = fullTypeName.IndexOf(FULL_TYPE_TARGET_TEXT);
                             int fullTypeNameLength = fullTypeName.Length;
@@ -180,18 +184,18 @@ namespace DSPPlanetInfoDumpMod
                             }
                             planetStringBuilderExtraInfo.Append(typeName).Append("\t");
                             planetStringBuilderExtraInfo.Append(typespecificity).Append("\t");
-                            planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "orbitRadiusValueTextEx")).Append("\t");
-                            planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "orbitRadiusValueText")).Append("\t");
-                            planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "orbitPeriodValueText")).Append("\t");
-                            planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "rotationPeriodValueText")).Append("\t");
-                            planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "inclinationValueText")).Append("\t");
-                            planetStringBuilderExtraInfo.Append(GetPlanetDetailField(planetDetail, "obliquityValueText")).AppendLine();
+                            planetStringBuilderExtraInfo.Append(planetDetail.orbitRadiusValueTextEx.text).Append("\t");
+                            planetStringBuilderExtraInfo.Append(planetDetail.orbitRadiusValueText.text).Append("\t");
+                            planetStringBuilderExtraInfo.Append(planetDetail.orbitPeriodValueText.text).Append("\t");
+                            planetStringBuilderExtraInfo.Append(planetDetail.rotationPeriodValueText.text).Append("\t");
+                            planetStringBuilderExtraInfo.Append(planetDetail.inclinationValueText.text).Append("\t");
+                            planetStringBuilderExtraInfo.Append(planetDetail.obliquityValueText.text).AppendLine();
                         }
                         starDetail.star = star;
                         foreach (var uiResAmountEntry in starDetail.entries)
                         {
                             starStringBuilder.Append(star.displayName).Append("\t");
-                            var name = GetUIResAmountEntryLabelText(uiResAmountEntry);
+                            var name = uiResAmountEntry.labelText.text;
                             var value = uiResAmountEntry.valueString;
                             starStringBuilder.Append(name).Append("\t");
                             starStringBuilder.Append(value).AppendLine();
@@ -222,22 +226,6 @@ namespace DSPPlanetInfoDumpMod
                 {
                     LogManager.Logger.LogInfo("DSP Planet Info Dump Mod plugin UISaveGameWindow#SaveSucceed Postfix end");
                 }
-            }
-
-            private static string GetPlanetDetailField(UIPlanetDetail target, string fieldName)
-            {
-                UI.Text text = (UI.Text)GetValueFromPrivateField(typeof(UIPlanetDetail), fieldName, target);
-                return text.text;
-            }
-
-            private static string GetUIResAmountEntryLabelText(UIResAmountEntry target)
-            {
-                UI.Text text = (UI.Text)GetValueFromPrivateField(typeof(UIResAmountEntry), "labelText", target);
-                return text.text;
-            }
-            private static object GetValueFromPrivateField(Type type, string fieldName, object target)
-            {
-                return type.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance).GetValue(target);
             }
         }
         public class LogManager
